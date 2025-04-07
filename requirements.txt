@@ -1,0 +1,7 @@
+numpy
+pandas
+ta-lib
+bayesian-optimization
+binance
+prometheus-client
+pytest
