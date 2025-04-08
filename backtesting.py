@@ -4,26 +4,15 @@ import pandas as pd
 import talib
 from itertools import product
 from bayes_opt import BayesianOptimization
+from dydx3 import Client  # Importar la biblioteca de dYdX
 from trading_bot.utils import get_technical_indicators, get_atr, get_price
 from trading_bot.config import SYMBOLS, BUDGET, DEFAULT_PROFIT_THRESHOLD, DEFAULT_TRAILING_STOP, PROFIT_THRESHOLD_RANGE, TRAILING_STOP_RANGE
 from trading_bot.ml_models import train_ml_model, predict_with_ml_model
 
 def backtest(client, symbol, profit_threshold, trailing_stop):
-    """
-    Realiza una prueba retrospectiva de una estrategia de trading utilizando indicadores técnicos y machine learning.
-
-    Args:
-        client (Client): Cliente de Binance.
-        symbol (str): Símbolo de la criptomoneda.
-        profit_threshold (float): Umbral de ganancia.
-        trailing_stop (float): Trailing stop.
-
-    Returns:
-        dict: Resultados de la prueba retrospectiva.
-    """
     logging.info(f"Backtesting para {symbol} con profit_threshold={profit_threshold}, trailing_stop={trailing_stop}")
-    klines = client.get_klines(symbol=symbol, interval="1h", limit=500)
-    close_prices = [float(k[4]) for k in klines]
+    klines = client.public.get_candles(market=symbol, resolution="1H", limit=500)  # Obtener datos de velas de dYdX
+    close_prices = [float(k['close']) for k in klines['candles']]
     df = pd.DataFrame(close_prices, columns=["close"])
     df["RSI"] = talib.RSI(df["close"].values, timeperiod=14)
     df["EMA12"] = pd.Series(df["close"]).ewm(span=12, adjust=False).mean()
@@ -72,16 +61,6 @@ def backtest(client, symbol, profit_threshold, trailing_stop):
     return {"total_profit": total_profit, "max_drawdown": max_drawdown, "sharpe_ratio": sharpe_ratio}
 
 def optimize_parameters(client, symbol):
-    """
-    Optimiza los parámetros de umbral de ganancia y trailing stop utilizando optimización bayesiana.
-
-    Args:
-        client (Client): Cliente de Binance.
-        symbol (str): Símbolo de la criptomoneda.
-
-    Returns:
-        dict: Parámetros óptimos.
-    """
     def objective(profit_threshold, trailing_stop):
         result = backtest(client, symbol, profit_threshold, trailing_stop)
         return result["total_profit"]
