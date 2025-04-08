@@ -4,28 +4,11 @@ import pandas as pd
 import talib
 from itertools import product
 from bayes_opt import BayesianOptimization
-from dydx3 import Client  # Importar la biblioteca de dYdX
+from dydx4 import Client  # Importar la biblioteca de dYdX4
 from trading_bot.utils import get_technical_indicators, get_atr, get_price
 from trading_bot.config import SYMBOLS, BUDGET, DEFAULT_PROFIT_THRESHOLD, DEFAULT_TRAILING_STOP, PROFIT_THRESHOLD_RANGE, TRAILING_STOP_RANGE
 from trading_bot.ml_models import train_ml_model, predict_with_ml_model
 from ml_models import train_ml_model, predict_with_ml_model
-
-def backtest(client, symbol, profit_threshold, trailing_stop):
-    ...
-    # Entrenar modelo de ML
-    model = train_ml_model(df)
-    ...
-    for i in range(200, len(df)):
-        if df["RSI"].iloc[i] < 30 and df["MACD"].iloc[i] > df["Signal"].iloc[i] and \
-                df["close"].iloc[i] > df["SMA50"].iloc[i] and df["close"].iloc[i] > df["EMA200"].iloc[i]:
-            if position is None:
-                # Predecir con modelo de ML
-                prediction = predict_with_ml_model(model, df.iloc[:i])
-                if prediction == "buy":
-                    position = "long"
-                    buy_price = df["close"].iloc[i]
-                    quantity = BUDGET * 0.25 / buy_price
-                    logging.info(f"Backtest Compra: Precio={buy_price}, Cantidad={quantity}")
 
 def backtest(client, symbol, profit_threshold, trailing_stop):
     logging.info(f"Backtesting para {symbol} con profit_threshold={profit_threshold}, trailing_stop={trailing_stop}")
