@@ -6,7 +6,8 @@ import numpy as np
 import pandas as pd
 from multiprocessing import Pool
 from dydx_v4_client import NodeClient, QueryNodeClient, IndexerClient, FaucetClient
-from dydx_v4_client.network import secure_channel, TESTNET
+from dydx_v4_client.network import secure_channel, TESTNET, TESTNET_FAUCET
+from tests.conftest import TEST_ADDRESS
 from trading_bot.utils import get_precision, get_price, get_volume, adjust_sleep_time, execute_with_retry, get_balance, validate_balance, get_atr, get_technical_indicators
 from trading_bot.config import SYMBOLS, BUDGET, DEFAULT_PROFIT_THRESHOLD, DEFAULT_TRAILING_STOP, REAL_MARKET
 from trading_bot.backtesting import optimize_parameters
@@ -38,10 +39,26 @@ with open(log_file, mode="w", newline="") as f:
     writer = csv.writer(f)
     writer.writerow(["Acción", "Símbolo", "Precio", "Cambio %", "Cantidad", "Saldo Restante"])
 
+node = await QueryNodeClient(secure_channel("test-dydx-grpc.kingnodes.com"))
+
 def log_transaction(action, price, change, quantity, remaining_balance):
     with open(log_file, mode="a", newline="") as f:
         writer = csv.writer(f)
         writer.writerow([action, symbol, price, change, quantity, remaining_balance])
+
+async def test(): 
+     faucet = FaucetClient(TESTNET_FAUCET) 
+     response = await faucet.fill(TEST_ADDRESS, 0, 2000) 
+     print(response) 
+     print(response.status) 
+  
+  
+ asyncio.run(test()) 
+
+async def test_account():
+    indexer = IndexerClient(TESTNET.rest_indexer)
+
+    print(await indexer.account.get_subaccounts("dydx1ree4zw38cxtn9l9mkjgdjnveud6mly0mr6wq9j"))
 
 async def initialize_client():
     try:
