@@ -8,6 +8,27 @@ from trading_bot.utils import get_precision, get_price, get_volume, adjust_sleep
 from trading_bot.config import SYMBOLS, BUDGET, DEFAULT_PROFIT_THRESHOLD, DEFAULT_TRAILING_STOP, REAL_MARKET
 from trading_bot.backtesting import optimize_parameters
 
+# Configura la salida de logging
+logging.basicConfig(level=logging.INFO)
+
+# Obtén un logger
+logger = logging.getLogger(__name__)
+
+# Usa el logger
+logger.info("Inicializando el bot de trading")
+
+# Ejemplo de inicialización del cliente
+try:
+    client = Client(
+        host='https://api.dydx.exchange',
+        api_key='tu_api_key',
+        api_secret='tu_api_secret',
+        passphrase='tu_passphrase'
+    )
+    logger.info("Cliente de dYdX inicializado correctamente")
+except Exception as e:
+    logger.error(f"Error al inicializar el cliente de dYdX: {e}")
+
 # Archivo de registro
 log_file = "transacciones.csv"
 with open(log_file, mode="w", newline="") as f:
