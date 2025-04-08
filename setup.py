@@ -12,6 +12,7 @@ setup(
         'binance',
         'prometheus-client',
         'pytest',
+        'dydx_v4_client',
     ],
     entry_points={
         'console_scripts': [
