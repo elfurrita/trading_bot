@@ -5,3 +5,4 @@ bayesian-optimization
 binance
 prometheus-client
 pytest
+dydx_v4_client
