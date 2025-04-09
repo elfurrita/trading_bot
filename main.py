@@ -3,10 +3,13 @@ import sys
 import logging
 import time
 import pandas as pd
-from dydx3 import Client
-from dydx3.constants import MARKET_BTC_USD, ORDER_SIDE_BUY, ORDER_SIDE_SELL
-from dydx3.helpers.request_helpers import generate_now_iso
+from dydx4 import Client
+from dydx4.constants import MARKET_BTC_USD, ORDER_SIDE_BUY, ORDER_SIDE_SELL
+from dydx4.helpers.request_helpers import generate_now_iso
+from dydx_v4_client import NodeClient, QueryNodeClient, IndexerClient, FaucetClient
+from dydx_v4_client.network import secure_channel, TESTNET, TESTNET_FAUCET
 from dotenv import load_dotenv
+import asyncio
 
 # Cargar variables de entorno
 load_dotenv()
@@ -33,9 +36,20 @@ client = Client(
     passphrase=DYDX_API_PASSPHRASE
 )
 
-def get_historical_data(symbol, interval='1h', limit=100):
+async def initialize_clients():
+    try:
+        node = await NodeClient(secure_channel("test-dydx-grpc.kingnodes.com"))
+        indexer = IndexerClient(TESTNET.rest_indexer)
+        faucet = FaucetClient(TESTNET_FAUCET)
+        logging.info("Clientes de dYdX inicializados correctamente")
+        return node, indexer, faucet
+    except Exception as e:
+        logging.error(f"Error al inicializar los clientes de dYdX: {e}")
+        return None, None, None
+
+async def get_historical_data(symbol, interval='1h', limit=100):
     """Obtiene datos históricos de una criptomoneda."""
-    candles = client.public.get_candles(
+    candles = await client.public.get_candles(
         market=symbol,
         resolution=interval,
         from_iso=generate_now_iso(),
@@ -44,10 +58,10 @@ def get_historical_data(symbol, interval='1h', limit=100):
     data = pd.DataFrame(candles['candles'])
     return data
 
-def place_order(market, side, size, price):
+async def place_order(market, side, size, price):
     """Coloca una orden en dYdX."""
     if REAL_MARKET:
-        client.private.create_order(
+        await client.private.create_order(
             market=market,
             side=side,
             size=size,
@@ -59,9 +73,15 @@ def place_order(market, side, size, price):
     else:
         logging.info(f"Simulación de orden {side}: {size} {market} a {price}")
 
-# Ejemplo de obtención de datos históricos
-data = get_historical_data(SYMBOLS[0])
-print(data.head())
+async def main():
+    node, indexer, faucet = await initialize_clients()
+    if node and indexer and faucet:
+        # Ejemplo de obtención de datos históricos
+        data = await get_historical_data(SYMBOLS[0])
+        print(data.head())
 
-# Ejemplo de colocación de una orden de compra
-place_order(SYMBOLS[0], ORDER_SIDE_BUY, 0.01, 30000)
+        # Ejemplo de colocación de una orden de compra
+        await place_order(SYMBOLS[0], ORDER_SIDE_BUY, 0.01, 30000)
+
+if __name__ == "__main__":
+    asyncio.run(main())
