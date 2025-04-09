@@ -24,7 +24,7 @@ Asegúrate de configurar correctamente las variables en `config.py`:
 ```python
 SYMBOLS = ['BTCUSDT', 'ETHUSDT']
 BUDGET = 1000
-DEFAULT_PROFIT_THRESHOLD = 0.05
+DEFAULT_PROFIT_THRESHOLD = 0.03
 DEFAULT_TRAILING_STOP = 0.02
 REAL_MARKET = False  # Cambiar a True para operar en el mercado real
 ```
