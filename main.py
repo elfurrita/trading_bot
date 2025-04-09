@@ -4,7 +4,7 @@ import logging
 import time
 import pandas as pd
 from dydx4 import Client
-from dydx4.constants import MARKET_BTC_USD, ORDER_SIDE_BUY, ORDER_SIDE_SELL
+from dydx4.constants import MARKET_BTC_USD, MARKET_ETH_USD, ORDER_SIDE_BUY, ORDER_SIDE_SELL
 from dydx4.helpers.request_helpers import generate_now_iso
 from dydx_v4_client import NodeClient, QueryNodeClient, IndexerClient, FaucetClient
 from dydx_v4_client.network import secure_channel, TESTNET, TESTNET_FAUCET
@@ -20,7 +20,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 # Configuración
 SYMBOLS = ['BTC-USD']  # dYdX utiliza diferentes símbolos
 BUDGET = 1000
-DEFAULT_PROFIT_THRESHOLD = 0.05
+DEFAULT_PROFIT_THRESHOLD = 0.03
 DEFAULT_TRAILING_STOP = 0.02
 REAL_MARKET = False  # Cambiar a True para operar en el mercado real
 DYDX_API_KEY = os.getenv('DYDX_API_KEY')
