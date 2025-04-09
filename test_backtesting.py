@@ -1,10 +1,10 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from trading_bot.backtesting import backtest, optimize_parameters
+from ..trading_bot.backtesting import backtest, optimize_parameters  # Importación relativa
 
 class TestBacktesting(unittest.TestCase):
 
-    @patch('trading_bot.backtesting.Client')
+    @patch('..trading_bot.backtesting.Client')
     def test_backtest(self, MockClient):
         mock_client = MockClient()
         mock_client.get_klines.return_value = [
@@ -15,7 +15,7 @@ class TestBacktesting(unittest.TestCase):
         self.assertIn('max_drawdown', result)
         self.assertIn('sharpe_ratio', result)
 
-    @patch('trading_bot.backtesting.Client')
+    @patch('..trading_bot.backtesting.Client')
     def test_optimize_parameters(self, MockClient):
         mock_client = MockClient()
         mock_client.get_klines.return_value = [
